@@ -98,7 +98,7 @@ class CartIdHandler {
                 } else if (product.stock < request.payload.product.quantity) {
                     return reply(BadRequest.invalidParameters('payload', {'product.quantity': ['Not enough in stock']})).code(400);
                 } else {
-                    cart = await Cart.updateProduct(cartId, request.payload.product.id, request.payload.product.quantity);
+                    cart = await Cart.updateProduct(cartId, request.payload.product.id, request.payload.product.quantity, request.payload.product.prescription.name);
                 }
             }
         } else {

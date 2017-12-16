@@ -201,7 +201,7 @@ class Cart {
      * Update cart product
      */
     @DBDecorators.table(tables.Cart)
-    static async updateProduct(cartId, productId, quantity) {
+    static async updateProduct(cartId, productId, quantity, prescriptionName) {
 
         let cart = await Cart.get(cartId);
 
@@ -213,16 +213,21 @@ class Cart {
                 break;
             }
         }
-        if (index === null && quantity > 0) {
+        if (index === null && quantity > 0) { // add new
             log.debug({productId, quantity}, 'Adding product to cart');
-            cart.products.push({id: productId, quantity: quantity});
+            cart.products.push({id: productId, quantity: quantity, prescription: prescriptionName});
         } else {
+            if (cart.products[index].prescription != prescriptionName && quantity > 0) {
+              log.debug({productId, quantity}, 'Adding product with different prescription to cart');
+              cart.products.push({id: productId, quantity: quantity, prescription: prescriptionName});
+            } else
             if (quantity == 0) { // Remove from cart
                 log.debug({productId}, 'Removing product from cart');
                 cart.products.splice(index, 1);
-            } else {
+            } else {  // update quantity
                 log.debug({productId, quantity}, 'Updating product quantity in cart');
                 cart.products[index].quantity = quantity;
+                cart.products[index].prescription = prescriptionName;
             }
         }
 
